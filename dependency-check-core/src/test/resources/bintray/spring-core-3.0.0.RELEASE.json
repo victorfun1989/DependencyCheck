@@ -1,0 +1,65 @@
+[{
+    "name": "spring-core-3.0.0.RELEASE.jar",
+    "path": "org/springframework/spring-core/3.0.0.RELEASE/spring-core-3.0.0.RELEASE.jar",
+    "repo": "jars",
+    "package": "org.springframework",
+    "version": "3.0.0.RELEASE",
+    "owner": "spring",
+    "created": "2014-04-09T15:31:14.570Z",
+    "size": 359338,
+    "sha1": "4f268922155ff53fb7b28aeca24fb28d5a439d95",
+    "linked_to_repo": "/bintray/jcenter"
+}, {
+    "name": "spring-core-3.0.0.release.jar",
+    "path": "org/springframework/spring-core/3.0.0.RELEASE/spring-core-3.0.0.release.jar",
+    "repo": "jars",
+    "package": "org.springframework",
+    "version": "3.0.0.RELEASE",
+    "owner": "spring",
+    "created": "2014-04-09T15:31:14.802Z",
+    "size": 359338,
+    "sha1": "4f268922155ff53fb7b28aeca24fb28d5a439d95",
+    "linked_to_repo": "/bintray/jcenter"
+}, {
+    "name": "spring-core-3.0.0.RELEASE.jar",
+    "path": "org/springframework/spring-core/3.0.0.RELEASE/spring-core-3.0.0.RELEASE.jar",
+    "repo": "jars",
+    "package": "org.springframework",
+    "version": "3.0.0.RELEASE",
+    "owner": "spring",
+    "created": "2014-04-09T15:31:14.570Z",
+    "size": 359338,
+    "sha1": "4f268922155ff53fb7b28aeca24fb28d5a439d95",
+    "linked_to_repo": "/xuzhiling/xuzhiling"
+}, {
+    "name": "spring-core-3.0.0.release.jar",
+    "path": "org/springframework/spring-core/3.0.0.RELEASE/spring-core-3.0.0.release.jar",
+    "repo": "jars",
+    "package": "org.springframework",
+    "version": "3.0.0.RELEASE",
+    "owner": "spring",
+    "created": "2014-04-09T15:31:14.802Z",
+    "size": 359338,
+    "sha1": "4f268922155ff53fb7b28aeca24fb28d5a439d95",
+    "linked_to_repo": "/xuzhiling/xuzhiling"
+}, {
+    "name": "spring-core-3.0.0.RELEASE.jar",
+    "path": "org/springframework/spring-core/3.0.0.RELEASE/spring-core-3.0.0.RELEASE.jar",
+    "repo": "jars",
+    "package": "org.springframework",
+    "version": "3.0.0.RELEASE",
+    "owner": "spring",
+    "created": "2014-04-09T15:31:14.570Z",
+    "size": 359338,
+    "sha1": "4f268922155ff53fb7b28aeca24fb28d5a439d95"
+}, {
+    "name": "spring-core-3.0.0.release.jar",
+    "path": "org/springframework/spring-core/3.0.0.RELEASE/spring-core-3.0.0.release.jar",
+    "repo": "jars",
+    "package": "org.springframework",
+    "version": "3.0.0.RELEASE",
+    "owner": "spring",
+    "created": "2014-04-09T15:31:14.802Z",
+    "size": 359338,
+    "sha1": "4f268922155ff53fb7b28aeca24fb28d5a439d95"
+}]

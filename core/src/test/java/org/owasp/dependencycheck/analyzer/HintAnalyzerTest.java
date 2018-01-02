@@ -16,7 +16,6 @@
 package org.owasp.dependencycheck.analyzer;
 
 import java.io.File;
-import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -72,7 +71,7 @@ public class HintAnalyzerTest extends BaseDBTestCase {
         //Dependency spring = new Dependency(files);
         getSettings().setBoolean(Settings.KEYS.AUTO_UPDATE, false);
         getSettings().setBoolean(Settings.KEYS.ANALYZER_NEXUS_ENABLED, false);
-        getSettings().setBoolean(Settings.KEYS.ANALYZER_CENTRAL_ENABLED, false);
+        getSettings().setBoolean(Settings.KEYS.ANALYZER_BINTRAY_ENABLED, false);
         try (Engine engine = new Engine(getSettings())) {
 
             engine.scan(guice);

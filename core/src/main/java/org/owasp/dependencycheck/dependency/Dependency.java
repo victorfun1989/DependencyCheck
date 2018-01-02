@@ -31,6 +31,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.owasp.dependencycheck.data.bintray.BintrayArtifact;
 import org.owasp.dependencycheck.data.nexus.MavenArtifact;
 import org.owasp.dependencycheck.utils.Checksum;
 import org.slf4j.Logger;
@@ -423,6 +424,48 @@ public class Dependency extends EvidenceCollection implements Serializable {
             if (!found) {
                 LOGGER.debug("Adding new maven identifier {}", mavenArtifact);
                 this.addIdentifier("maven", mavenArtifact.toString(), mavenArtifact.getArtifactUrl(), Confidence.HIGHEST);
+            }
+        }
+    }
+
+    /**
+     * Adds the artifact as evidence.
+     *
+     * @param source The source of the evidence
+     * @param artifact The artifact
+     * @param confidence The confidence level of this evidence
+     */
+    public void addAsEvidence(String source, BintrayArtifact artifact, Confidence confidence) {
+        if (artifact.getPackageName() != null && !artifact.getPackageName().isEmpty()) {
+            String[] parts = artifact.getPackageName().split(":");
+            if (parts.length == 2) {
+                this.addEvidence(EvidenceType.VENDOR, source, "packageName", parts[0], confidence);
+                this.addEvidence(EvidenceType.PRODUCT, source, "packageName", parts[1], confidence);
+            } else {
+                this.addEvidence(EvidenceType.VENDOR, source, "packageName", artifact.getPackageName(), confidence);
+                this.addEvidence(EvidenceType.PRODUCT, source, "packageName", artifact.getPackageName(), confidence);
+            }
+        }
+        if (artifact.getVersion() != null && !artifact.getVersion().isEmpty()) {
+            this.addEvidence(EvidenceType.VERSION, source, "version", artifact.getVersion(), confidence);
+        }
+        if (artifact.getArtifactUrl() != null) {
+            boolean found = false;
+            synchronized (this) {
+                for (Identifier i : this.identifiers) {
+                    //TODO change "maven" to "packagePath"
+                    if ("maven".equals(i.getType()) && i.getValue().equals(artifact.getCoordinates())) {
+                        found = true;
+                        i.setConfidence(Confidence.HIGHEST);
+                        i.setUrl(artifact.getArtifactUrl());
+                        LOGGER.debug("Already found identifier {}. Confidence set to highest", i.getValue());
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                LOGGER.debug("Adding new maven identifier {}", artifact);
+                this.addIdentifier("maven", artifact.getCoordinates(), artifact.getArtifactUrl(), Confidence.HIGHEST);
             }
         }
     }

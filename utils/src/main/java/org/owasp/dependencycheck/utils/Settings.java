@@ -328,9 +328,9 @@ public final class Settings {
          */
         public static final String ANALYZER_NEXUS_USES_PROXY = "analyzer.nexus.proxy";
         /**
-         * The properties key for whether the Central analyzer is enabled.
+         * The properties key for whether the bintray analyzer is enabled.
          */
-        public static final String ANALYZER_CENTRAL_ENABLED = "analyzer.central.enabled";
+        public static final String ANALYZER_BINTRAY_ENABLED = "analyzer.bintray.enabled";
         /**
          * The properties key for whether the OpenSSL analyzer is enabled.
          */
@@ -345,13 +345,13 @@ public final class Settings {
          */
         public static final String ANALYZER_SWIFT_PACKAGE_MANAGER_ENABLED = "analyzer.swift.package.manager.enabled";
         /**
-         * The properties key for the Central search URL.
+         * The properties key for the bintray search URL.
          */
-        public static final String ANALYZER_CENTRAL_URL = "analyzer.central.url";
+        public static final String ANALYZER_BINTRAY_URL = "analyzer.bintray.url";
         /**
-         * The properties key for the Central search query.
+         * The properties key for the bintray search query.
          */
-        public static final String ANALYZER_CENTRAL_QUERY = "analyzer.central.query";
+        public static final String ANALYZER_BINTRAY_QUERY = "analyzer.bintray.query";
         /**
          * The path to mono, if available.
          */

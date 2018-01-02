@@ -1,0 +1,11 @@
+[{
+    "name": "scala-library-2.11.2.jar",
+    "path": "org/scala-lang/scala-library/2.11.2/scala-library-2.11.2.jar",
+    "repo": "jcenter",
+    "package": "org.scala-lang:scala-library",
+    "version": "2.11.2",
+    "owner": "bintray",
+    "created": "2014-07-23T13:02:51.371Z",
+    "size": 5545300,
+    "sha1": "4718c022bd5bd84705ddacec18072c351832bc20"
+}]

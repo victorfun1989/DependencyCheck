@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Copyright (c) 2014 Jeremy Long. All Rights Reserved.
+ * Copyright (c) 2017 Jeremy Long. All Rights Reserved.
  */
 package org.owasp.dependencycheck.analyzer;
 
 import org.apache.commons.io.FileUtils;
 import org.owasp.dependencycheck.Engine;
 import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
-import org.owasp.dependencycheck.data.central.CentralSearch;
+import org.owasp.dependencycheck.data.bintray.BintraySearch;
 import org.owasp.dependencycheck.data.nexus.MavenArtifact;
 import org.owasp.dependencycheck.dependency.Confidence;
 import org.owasp.dependencycheck.dependency.Dependency;
@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
+import org.owasp.dependencycheck.data.bintray.BintrayArtifact;
 import org.owasp.dependencycheck.dependency.EvidenceType;
 import org.owasp.dependencycheck.exception.InitializationException;
 import org.owasp.dependencycheck.utils.DownloadFailedException;
@@ -47,22 +48,22 @@ import org.owasp.dependencycheck.utils.Settings;
 
 /**
  * Analyzer which will attempt to locate a dependency, and the GAV information,
- * by querying Central for the dependency's SHA-1 digest.
+ * by querying Bintray for the dependency's SHA-1 digest.
  *
- * @author colezlaw
+ * @author Jeremy Long
  */
 @ThreadSafe
-public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
+public class BintrayAnalyzer extends AbstractFileTypeAnalyzer {
 
     /**
      * The logger.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CentralAnalyzer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BintrayAnalyzer.class);
 
     /**
      * The name of the analyzer.
      */
-    private static final String ANALYZER_NAME = "Central Analyzer";
+    private static final String ANALYZER_NAME = "Bintray Analyzer";
 
     /**
      * The phase in which this analyzer runs.
@@ -75,16 +76,9 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
     private static final String SUPPORTED_EXTENSIONS = "jar";
 
     /**
-     * There may be temporary issues when connecting to MavenCentral. In order
-     * to compensate for 99% of the issues, we perform a retry before finally
-     * failing the analysis.
-     */
-    private static final int NUMBER_OF_TRIES = 5;
-
-    /**
      * The searcher itself.
      */
-    private CentralSearch searcher;
+    private BintraySearch searcher;
 
     /**
      * Initializes the analyzer with the configured settings.
@@ -107,19 +101,19 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
         boolean retVal = false;
 
         try {
-            if (getSettings().getBoolean(Settings.KEYS.ANALYZER_CENTRAL_ENABLED)) {
+            if (getSettings().getBoolean(Settings.KEYS.ANALYZER_BINTRAY_ENABLED)) {
                 if (!getSettings().getBoolean(Settings.KEYS.ANALYZER_NEXUS_ENABLED)
                         || NexusAnalyzer.DEFAULT_URL.equals(getSettings().getString(Settings.KEYS.ANALYZER_NEXUS_URL))) {
-                    LOGGER.debug("Enabling the Central analyzer");
+                    LOGGER.debug("Enabling the Bintray analyzer");
                     retVal = true;
                 } else {
-                    LOGGER.info("Nexus analyzer is enabled, disabling the Central Analyzer");
+                    LOGGER.info("Nexus analyzer is enabled, disabling the Bintray Analyzer");
                 }
             } else {
-                LOGGER.info("Central analyzer disabled");
+                LOGGER.info("Bintray analyzer disabled");
             }
         } catch (InvalidSettingException ise) {
-            LOGGER.warn("Invalid setting. Disabling the Central analyzer");
+            LOGGER.warn("Invalid setting. Disabling the Bintray analyzer");
         }
         return retVal;
     }
@@ -132,14 +126,14 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
      */
     @Override
     public void prepareFileTypeAnalyzer(Engine engine) throws InitializationException {
-        LOGGER.debug("Initializing Central analyzer");
-        LOGGER.debug("Central analyzer enabled: {}", isEnabled());
+        LOGGER.debug("Initializing Bintray analyzer");
+        LOGGER.debug("Bintray analyzer enabled: {}", isEnabled());
         if (isEnabled()) {
             try {
-                searcher = new CentralSearch(getSettings());
+                searcher = new BintraySearch(getSettings());
             } catch (MalformedURLException ex) {
                 setEnabled(false);
-                throw new InitializationException("The configured URL to Maven Central is malformed", ex);
+                throw new InitializationException("The configured URL to Bintray API is malformed", ex);
             }
         }
     }
@@ -162,7 +156,7 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
      */
     @Override
     protected String getAnalyzerEnabledSettingKey() {
-        return Settings.KEYS.ANALYZER_CENTRAL_ENABLED;
+        return Settings.KEYS.ANALYZER_BINTRAY_ENABLED;
     }
 
     /**
@@ -195,11 +189,11 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
     @Override
     public void analyzeDependency(Dependency dependency, Engine engine) throws AnalysisException {
         try {
-            final List<MavenArtifact> mas = fetchMavenArtifacts(dependency);
-            final Confidence confidence = mas.size() > 1 ? Confidence.HIGH : Confidence.HIGHEST;
-            for (MavenArtifact ma : mas) {
-                LOGGER.debug("Central analyzer found artifact ({}) for dependency ({})", ma, dependency.getFileName());
-                dependency.addAsEvidence("central", ma, confidence);
+            final BintrayArtifact[] bas = fetchArtifacts(dependency);
+            final Confidence confidence = bas.length > 1 ? Confidence.HIGH : Confidence.HIGHEST;
+            for (BintrayArtifact ba : bas) {
+                LOGGER.debug("Bintray analyzer found artifact ({}) for dependency ({})", ba.getPackageName(), dependency.getFileName());
+                dependency.addAsEvidence("bintray", ba, confidence);
                 boolean pomAnalyzed = false;
                 for (Evidence e : dependency.getEvidence(EvidenceType.VENDOR)) {
                     if ("pom".equals(e.getSource())) {
@@ -207,23 +201,23 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
                         break;
                     }
                 }
-                if (!pomAnalyzed && ma.getPomUrl() != null) {
+                if (!pomAnalyzed && ba.getPomUrl() != null) {
                     File pomFile = null;
                     try {
                         final File baseDir = getSettings().getTempDirectory();
                         pomFile = File.createTempFile("pom", ".xml", baseDir);
                         if (!pomFile.delete()) {
-                            LOGGER.warn("Unable to fetch pom.xml for {} from Central; "
+                            LOGGER.warn("Unable to fetch pom.xml for {} from Bintray; "
                                     + "this could result in undetected CPE/CVEs.", dependency.getFileName());
                             LOGGER.debug("Unable to delete temp file");
                         }
-                        LOGGER.debug("Downloading {}", ma.getPomUrl());
+                        LOGGER.debug("Downloading {}", ba.getPomUrl());
                         final Downloader downloader = new Downloader(getSettings());
-                        downloader.fetchFile(new URL(ma.getPomUrl()), pomFile);
+                        downloader.fetchFile(new URL(ba.getPomUrl()), pomFile);
                         PomUtils.analyzePOM(dependency, pomFile);
 
                     } catch (DownloadFailedException ex) {
-                        LOGGER.warn("Unable to download pom.xml for {} from Central; "
+                        LOGGER.warn("Unable to download pom.xml for {} from Bintray; "
                                 + "this could result in undetected CPE/CVEs.", dependency.getFileName());
                     } finally {
                         if (pomFile != null && pomFile.exists() && !FileUtils.deleteQuietly(pomFile)) {
@@ -232,68 +226,36 @@ public class CentralAnalyzer extends AbstractFileTypeAnalyzer {
                         }
                     }
                 }
-
             }
         } catch (IllegalArgumentException iae) {
             LOGGER.info("invalid sha1-hash on {}", dependency.getFileName());
         } catch (FileNotFoundException fnfe) {
             LOGGER.debug("Artifact not found in repository: '{}", dependency.getFileName());
         } catch (IOException ioe) {
-            final String message = "Could not connect to Central search. Analysis failed.";
+            final String message = "Could not connect to Bintray API. Analysis failed.";
             LOGGER.error(message, ioe);
             throw new AnalysisException(message, ioe);
         }
     }
 
     /**
-     * Downloads the corresponding list of MavenArtifacts of the given
-     * dependency from MavenCentral.
-     * <p>
-     * As the connection to MavenCentral is known to be unreliable, we implement
-     * a simple retry logic in order to compensate for 99% of the issues.
+     * Downloads the information about the dependency from Bintray.
      *
      * @param dependency the dependency to analyze
      * @return the downloaded list of MavenArtifacts
      * @throws FileNotFoundException if the specified artifact is not found
-     * @throws IOException if connecting to MavenCentral finally failed
+     * @throws IOException if connecting to Bintray failed
      */
-    protected List<MavenArtifact> fetchMavenArtifacts(Dependency dependency) throws IOException {
-        IOException lastException = null;
-        long sleepingTimeBetweenRetriesInMillis = 1000;
-        int triesLeft = NUMBER_OF_TRIES;
-        while (triesLeft-- > 0) {
-            try {
-                return searcher.searchSha1(dependency.getSha1sum());
-            } catch (FileNotFoundException fnfe) {
-                // retry does not make sense, just throw the exception
-                throw fnfe;
-            } catch (IOException ioe) {
-                LOGGER.debug("Could not connect to Central search (tries left: {}): {}",
-                        triesLeft, ioe.getMessage());
-                lastException = ioe;
-
-                if (triesLeft > 0) {
-                    try {
-                        Thread.sleep(sleepingTimeBetweenRetriesInMillis);
-                        sleepingTimeBetweenRetriesInMillis *= 2;
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
-        }
-
-        final String message = "Finally failed connecting to Central search."
-                + " Giving up after " + NUMBER_OF_TRIES + " tries.";
-        throw new IOException(message, lastException);
+    protected BintrayArtifact[] fetchArtifacts(Dependency dependency) throws IOException {
+        return searcher.searchSha1(dependency.getSha1sum());
     }
 
     /**
      * Method used by unit tests to setup the analyzer.
      *
-     * @param searcher the Central Search object to use.
+     * @param searcher the Bintray Search object to use.
      */
-    protected void setCentralSearch(CentralSearch searcher) {
+    protected void setBintraySearch(BintraySearch searcher) {
         this.searcher = searcher;
     }
 }

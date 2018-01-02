@@ -17,7 +17,14 @@
  */
 package org.owasp.dependencycheck.dependency;
 
+import com.google.gson.Gson;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +35,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.owasp.dependencycheck.BaseTest;
+import org.owasp.dependencycheck.data.bintray.BintrayArtifact;
+import org.owasp.dependencycheck.data.bintray.BintraySearch;
 import org.owasp.dependencycheck.data.nexus.MavenArtifact;
 
 /**
@@ -235,5 +244,20 @@ public class DependencyTest extends BaseTest {
         assertFalse(instance.getEvidence(EvidenceType.VENDOR).contains(Confidence.HIGH));
         assertTrue(instance.size() == 0);
         assertTrue(instance.getIdentifiers().isEmpty());
+    }
+    
+        /**
+     * Test of addAsEvidence method, of class Dependency.
+     */
+    @Test
+    public void testAddAsEvidenceBintray() throws MalformedURLException, IOException {
+        InputStream stream = BaseTest.getResourceAsStream(this, "bintray/spring-core-3.0.0.RELEASE.json");
+        Reader reader = new InputStreamReader(stream, Charset.forName("UTF-8"));
+        BintrayArtifact[] artifacts = new Gson().fromJson(reader, BintrayArtifact[].class);
+        Dependency instance = new Dependency();
+        instance.addAsEvidence("bintray", artifacts[0], Confidence.HIGH);
+        assertTrue(instance.contains(EvidenceType.VENDOR, Confidence.HIGH));
+        assertTrue(instance.size() > 1);
+        assertFalse(instance.getIdentifiers().isEmpty());
     }
 }

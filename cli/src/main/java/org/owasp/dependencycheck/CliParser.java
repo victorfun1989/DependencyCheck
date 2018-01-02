@@ -790,7 +790,7 @@ public final class CliParser {
      * otherwise false
      */
     public boolean isCentralDisabled() {
-        return hasDisableOption(ARGUMENT.DISABLE_CENTRAL, Settings.KEYS.ANALYZER_CENTRAL_ENABLED);
+        return hasDisableOption(ARGUMENT.DISABLE_CENTRAL, Settings.KEYS.ANALYZER_BINTRAY_ENABLED);
     }
 
     /**

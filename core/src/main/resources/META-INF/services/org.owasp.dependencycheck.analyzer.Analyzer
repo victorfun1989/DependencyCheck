@@ -9,7 +9,7 @@ org.owasp.dependencycheck.analyzer.DependencyBundlingAnalyzer
 org.owasp.dependencycheck.analyzer.DependencyMergingAnalyzer
 org.owasp.dependencycheck.analyzer.NvdCveAnalyzer
 org.owasp.dependencycheck.analyzer.VulnerabilitySuppressionAnalyzer
-org.owasp.dependencycheck.analyzer.CentralAnalyzer
+org.owasp.dependencycheck.analyzer.BintrayAnalyzer
 org.owasp.dependencycheck.analyzer.NexusAnalyzer
 org.owasp.dependencycheck.analyzer.NuspecAnalyzer
 org.owasp.dependencycheck.analyzer.AssemblyAnalyzer
