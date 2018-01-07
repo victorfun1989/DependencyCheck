@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2017 Jeremy Long. All Rights Reserved.
  */
-package org.owasp.dependencycheck.data.bintray;
+package org.owasp.dependencycheck.search.bintray;
 
 import com.google.gson.Gson;
 import java.io.FileNotFoundException;

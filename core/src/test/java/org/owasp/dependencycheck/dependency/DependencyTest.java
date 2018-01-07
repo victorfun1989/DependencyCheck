@@ -35,9 +35,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.owasp.dependencycheck.BaseTest;
-import org.owasp.dependencycheck.data.bintray.BintrayArtifact;
-import org.owasp.dependencycheck.data.bintray.BintraySearch;
-import org.owasp.dependencycheck.data.nexus.MavenArtifact;
+import org.owasp.dependencycheck.search.bintray.BintrayArtifact;
+import org.owasp.dependencycheck.search.bintray.BintraySearch;
+import org.owasp.dependencycheck.search.nexus.MavenArtifact;
 
 /**
  *

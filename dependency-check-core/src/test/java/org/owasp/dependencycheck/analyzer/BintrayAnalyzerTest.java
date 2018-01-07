@@ -21,7 +21,7 @@ import mockit.Expectations;
 import mockit.Mocked;
 import org.junit.Test;
 import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
-import org.owasp.dependencycheck.data.bintray.BintraySearch;
+import org.owasp.dependencycheck.search.bintray.BintraySearch;
 import org.owasp.dependencycheck.dependency.Dependency;
 
 import java.io.FileNotFoundException;

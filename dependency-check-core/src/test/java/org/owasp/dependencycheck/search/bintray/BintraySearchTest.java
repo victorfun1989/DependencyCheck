@@ -15,12 +15,12 @@
  *
  * Copyright (c) 2017 Jeremy Long. All Rights Reserved.
  */
-package org.owasp.dependencycheck.data.bintray;
+package org.owasp.dependencycheck.search.bintray;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.dependencycheck.BaseTest;
-import org.owasp.dependencycheck.data.nexus.MavenArtifact;
+import org.owasp.dependencycheck.search.nexus.MavenArtifact;
 import org.owasp.dependencycheck.utils.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

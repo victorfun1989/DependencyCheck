@@ -51,7 +51,7 @@ import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.owasp.dependencycheck.Engine;
-import org.owasp.dependencycheck.data.nexus.MavenArtifact;
+import org.owasp.dependencycheck.search.nexus.MavenArtifact;
 import org.owasp.dependencycheck.data.nvdcve.DatabaseException;
 import org.owasp.dependencycheck.dependency.Confidence;
 import org.owasp.dependencycheck.dependency.Dependency;

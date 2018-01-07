@@ -31,8 +31,8 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.owasp.dependencycheck.data.bintray.BintrayArtifact;
-import org.owasp.dependencycheck.data.nexus.MavenArtifact;
+import org.owasp.dependencycheck.search.bintray.BintrayArtifact;
+import org.owasp.dependencycheck.search.nexus.MavenArtifact;
 import org.owasp.dependencycheck.utils.Checksum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
