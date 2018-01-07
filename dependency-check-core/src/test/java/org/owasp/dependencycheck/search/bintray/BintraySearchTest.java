@@ -20,21 +20,10 @@ package org.owasp.dependencycheck.search.bintray;
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.dependencycheck.BaseTest;
-import org.owasp.dependencycheck.search.nexus.MavenArtifact;
-import org.owasp.dependencycheck.utils.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
-
 import static org.junit.Assert.*;
-import org.junit.BeforeClass;
 
 /**
  * @author Jeremy Long
