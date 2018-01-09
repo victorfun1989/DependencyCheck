@@ -18,10 +18,6 @@
 package org.owasp.dependencycheck.search.bintray;
 
 import com.google.gson.annotations.SerializedName;
-import com.sun.xml.internal.ws.util.VersionUtil;
-import org.apache.commons.io.FilenameUtils;
-import org.owasp.dependencycheck.utils.DependencyVersion;
-import org.owasp.dependencycheck.utils.DependencyVersionUtil;
 
 /**
  *
