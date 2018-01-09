@@ -120,9 +120,12 @@ public class BintraySearch {
         return conn;
     }
 
+    private int counter = 0;
+
     protected BintrayArtifact[] parseResponse(InputStream stream) throws IOException, FileNotFoundException {
-        Reader reader = new InputStreamReader(stream, Charset.forName("UTF-8"));
-        return new Gson().fromJson(reader, BintrayArtifact[].class);
+        final Reader reader = new InputStreamReader(stream, Charset.forName("UTF-8"));
+        final BintrayArtifact[] results = new Gson().fromJson(reader, BintrayArtifact[].class);
+        return results;
     }
 
     /**

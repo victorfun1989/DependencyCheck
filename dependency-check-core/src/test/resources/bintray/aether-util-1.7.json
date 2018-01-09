@@ -1,0 +1,13 @@
+[
+    {
+        "name": "aether-util-1.7.jar",
+        "path": "org/sonatype/aether/aether-util/1.7/aether-util-1.7.jar",
+        "repo": "maven-repo",
+        "package": "java9-migration",
+        "version": "Initial",
+        "owner": "isabiq",
+        "created": "2017-12-16T15:24:46.696Z",
+        "size": "107949",
+        "sha1": "38485c9c086c3c867c2dd5371909337bd056c492"
+    }
+]

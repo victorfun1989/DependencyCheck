@@ -18,6 +18,10 @@
 package org.owasp.dependencycheck.search.bintray;
 
 import com.google.gson.annotations.SerializedName;
+import com.sun.xml.internal.ws.util.VersionUtil;
+import org.apache.commons.io.FilenameUtils;
+import org.owasp.dependencycheck.utils.DependencyVersion;
+import org.owasp.dependencycheck.utils.DependencyVersionUtil;
 
 /**
  *
@@ -25,12 +29,11 @@ import com.google.gson.annotations.SerializedName;
  */
 public class BintrayArtifact {
 
-    
     /**
      * The path to the JCenter repo formated for use in String.format() so one
      * can easily obtain the URL for an artifact.
      */
-    private static final String JCENTER_PATH_FORMAT = "https://dl.bintray.com/{}/{}/{}";
+    private static final String JCENTER_PATH_FORMAT = "https://dl.bintray.com/%s/%s/%s";
     /**
      * The name of the artifact.
      */
@@ -157,22 +160,71 @@ public class BintrayArtifact {
     public String getSha1() {
         return sha1;
     }
+
     /**
      * Returns the full coordinates of the artifact - package path + version.
-     * @return the full coordinates of the artifact - package path + version 
+     *
+     * @return the full coordinates of the artifact - package path + version
      */
     public String getCoordinates() {
-        return String.format("%s:%s", packageName, version);
+        if (path==null) {
+            return null;
+        }
+        final String[] parts = path.split("/");
+        if (parts.length<4) {
+            return null;
+        }
+        final String cordVersion = parts[parts.length-2];
+        final String cordArtifactId = parts[parts.length-3];
+        StringBuilder sb = new StringBuilder();
+        String period="";
+        for (int i=0;i<parts.length-3;i++) {
+            sb.append(period).append(parts[i]);
+            if (period.isEmpty()) {
+                period = ".";
+            }
+        }
+        return  String.format("%s:%s:%s", sb.toString(), cordArtifactId, cordVersion);
+        
+//        if (!packageName.contains(":") && name != null) {
+//            int pos = FilenameUtils.indexOfExtension(name);
+//            String artifactId;
+//            if (pos > 1) {
+//                artifactId = name.substring(0, pos);
+//            } else {
+//                artifactId = name;
+//            }
+//            if (artifactId.endsWith(version)) {
+//                artifactId = artifactId.substring(0, artifactId.length() - version.length() - 1);
+//            } else {
+//                final String dependencyVersion = DependencyVersionUtil.parseVersion(artifactId).toString();
+//                if (dependencyVersion!=null) {
+//                    artifactId = artifactId.substring(0, artifactId.length() - dependencyVersion.length() - 1);    
+//                }
+//            }
+//            if (path != null) {
+//                String tmp = path.replace("/", ".");
+//                pos = tmp.lastIndexOf("." + artifactId + ".");
+//                if (pos > 0) {
+//                    tmp = tmp.substring(0, pos);
+//                    return String.format("%s:%s:%s", tmp, artifactId, version);
+//                }
+//            }
+//
+//            return String.format("%s:%s:%s", packageName, artifactId, version);
+//        }
+//        return String.format("%s:%s", packageName, version);
     }
+
     public String getArtifactUrl() {
-        if (owner!=null && repo!=null && path != null && !path.isEmpty()) {
+        if (owner != null && repo != null && path != null && !path.isEmpty()) {
             return String.format(JCENTER_PATH_FORMAT, owner, repo, path);
         }
         return null;
     }
 
     public String getPomUrl() {
-        if (owner!=null && repo!=null && path != null && !path.endsWith(".jar")) {
+        if (owner != null && repo != null && path != null && path.endsWith(".jar")) {
             final String pomPath = path.substring(0, path.length() - 3) + "pom";
             return String.format(JCENTER_PATH_FORMAT, owner, repo, pomPath);
         }

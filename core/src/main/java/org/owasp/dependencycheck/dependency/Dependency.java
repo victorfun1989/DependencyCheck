@@ -436,18 +436,42 @@ public class Dependency extends EvidenceCollection implements Serializable {
      * @param confidence The confidence level of this evidence
      */
     public void addAsEvidence(String source, BintrayArtifact artifact, Confidence confidence) {
-        if (artifact.getPackageName() != null && !artifact.getPackageName().isEmpty()) {
-            String[] parts = artifact.getPackageName().split(":");
+        final String packageName = artifact.getPackageName();
+        final String artifactVersion = artifact.getVersion();
+        final String path = artifact.getPath();
+        final String artifactName = artifact.getName();
+        if (artifactName != null) {
+            this.addEvidence(EvidenceType.PRODUCT, source, "name", artifactName, confidence);
+        }
+        if (packageName != null && !packageName.isEmpty()) {
+            boolean added = false;
+            final String[] parts = packageName.split(":");
             if (parts.length == 2) {
                 this.addEvidence(EvidenceType.VENDOR, source, "packageName", parts[0], confidence);
                 this.addEvidence(EvidenceType.PRODUCT, source, "packageName", parts[1], confidence);
-            } else {
-                this.addEvidence(EvidenceType.VENDOR, source, "packageName", artifact.getPackageName(), confidence);
-                this.addEvidence(EvidenceType.PRODUCT, source, "packageName", artifact.getPackageName(), confidence);
+                added = true;
+            } else if (parts.length == 1 && path != null) {
+                String artifactId = path.replace('/', '.');
+                if (artifactId.startsWith(packageName + ".")) {
+                    artifactId = path.substring(packageName.length() + 1);
+                }
+                if (artifactVersion != null) {
+                    final int pos = artifactId.indexOf("." + version + ".");
+                    if (pos > 0) {
+                        artifactId = artifactId.substring(0, pos - 1);
+                    }
+                }
+                this.addEvidence(EvidenceType.VENDOR, source, "packageName", packageName, confidence);
+                this.addEvidence(EvidenceType.PRODUCT, source, "path", artifactId, confidence);
+                added = true;
+            }
+            if (!added) {
+                this.addEvidence(EvidenceType.VENDOR, source, "packageName", packageName, confidence);
+                this.addEvidence(EvidenceType.PRODUCT, source, "packageName", packageName, confidence);
             }
         }
-        if (artifact.getVersion() != null && !artifact.getVersion().isEmpty()) {
-            this.addEvidence(EvidenceType.VERSION, source, "version", artifact.getVersion(), confidence);
+        if (artifactVersion != null && !artifactVersion.isEmpty()) {
+            this.addEvidence(EvidenceType.VERSION, source, "version", artifactVersion, confidence);
         }
         if (artifact.getArtifactUrl() != null) {
             boolean found = false;
