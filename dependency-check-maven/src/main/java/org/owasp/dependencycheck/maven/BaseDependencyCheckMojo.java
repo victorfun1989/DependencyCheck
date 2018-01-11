@@ -152,10 +152,11 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
     @Parameter(defaultValue = "${project.build.directory}", required = true)
     private File outputDirectory;
     /**
-     * Specifies the destination directory for the generated Dependency-Check
-     * report. This generally maps to "target/site".
+     * This is a reference to the &gt;reporting&lt; sections <code>outputDirectory</code>.
+     * This cannot be configured in the dependency-check mojo directly.
+     * This generally maps to "target/site".
      */
-    @Parameter(property = "project.reporting.outputDirectory", required = true)
+    @Parameter(property = "project.reporting.outputDirectory", readonly = true)
     private File reportOutputDirectory;
     /**
      * Specifies if the build should be failed if a CVSS score above a specified
@@ -967,7 +968,7 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
      * @param currentEx the primary exception collection
      * @param newEx the new exception collection to add
      * @return the combined exception collection
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException thrown if dependency-check is configured to fail on errors
      */
     private ExceptionCollection handleAnalysisExceptions(ExceptionCollection currentEx, ExceptionCollection newEx) throws MojoExecutionException {
         ExceptionCollection returnEx = currentEx;
@@ -1105,7 +1106,7 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
             mojoProperties = this.getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE);
             settings.mergeProperties(mojoProperties);
         } catch (IOException ex) {
-            getLog().warn("Unable to load the dependency-check ant task.properties file.");
+            getLog().warn("Unable to load the dependency-check maven mojo.properties file.");
             if (getLog().isDebugEnabled()) {
                 getLog().debug("", ex);
             }
@@ -1364,8 +1365,8 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
                     msg = String.format("%n%nOne or more dependencies were identified with vulnerabilities: %n%s%n%n"
                             + "See the dependency-check report for more details.%n%n", ids.toString());
                 } else {
-                    msg = String.format("%n%nOne or more dependencies were identified with vulnerabilities that have a CVSS score greater than or equal to '%.1f': "
-                            + "%n%s%n%nSee the dependency-check report for more details.%n%n", failBuildOnCVSS, ids.toString());
+                    msg = String.format("%n%nOne or more dependencies were identified with vulnerabilities that have a CVSS score greater than or equal "
+                            + "to '%.1f': %n%s%n%nSee the dependency-check report for more details.%n%n", failBuildOnCVSS, ids.toString());
                 }
             } else {
                 msg = String.format("%n%nOne or more dependencies were identified with vulnerabilities.%n%n"
