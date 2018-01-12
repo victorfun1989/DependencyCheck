@@ -20,6 +20,7 @@ package org.owasp.dependencycheck.search.bintray;
 import com.google.gson.annotations.SerializedName;
 
 /**
+ * Object to store information retrieved from bintray.
  *
  * @author jeremy long
  */
@@ -163,25 +164,25 @@ public class BintrayArtifact {
      * @return the full coordinates of the artifact - package path + version
      */
     public String getCoordinates() {
-        if (path==null) {
+        if (path == null) {
             return null;
         }
         final String[] parts = path.split("/");
-        if (parts.length<4) {
+        if (parts.length < 4) {
             return null;
         }
-        final String cordVersion = parts[parts.length-2];
-        final String cordArtifactId = parts[parts.length-3];
+        final String cordVersion = parts[parts.length - 2];
+        final String cordArtifactId = parts[parts.length - 3];
         StringBuilder sb = new StringBuilder();
-        String period="";
-        for (int i=0;i<parts.length-3;i++) {
+        String period = "";
+        for (int i = 0; i < parts.length - 3; i++) {
             sb.append(period).append(parts[i]);
             if (period.isEmpty()) {
                 period = ".";
             }
         }
-        return  String.format("%s:%s:%s", sb.toString(), cordArtifactId, cordVersion);
-        
+        return String.format("%s:%s:%s", sb.toString(), cordArtifactId, cordVersion);
+
 //        if (!packageName.contains(":") && name != null) {
 //            int pos = FilenameUtils.indexOfExtension(name);
 //            String artifactId;
