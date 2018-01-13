@@ -17,95 +17,82 @@
  */
 package org.owasp.dependencycheck.analyzer;
 
-import mockit.Expectations;
-import mockit.Mocked;
+import java.io.File;
+import java.io.FileFilter;
 import org.junit.Test;
-import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
-import org.owasp.dependencycheck.search.bintray.BintraySearch;
 import org.owasp.dependencycheck.dependency.Dependency;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.owasp.dependencycheck.BaseTest;
 
 /**
  * Tests for the BintrayAnalyzer.
  */
-public class BintrayAnalyzerTest {
+public class BintrayAnalyzerTest extends BaseTest {
 
-    private static final String SHA1_SUM = "my-sha1-sum";
+    private BintrayAnalyzer instance;
 
-    @Test(expected = FileNotFoundException.class)
-    @SuppressWarnings("PMD.NonStaticInitializer")
-    public void testFetchMavenArtifactsRethrowsFileNotFoundException(@Mocked final BintraySearch search,
-            @Mocked final Dependency dependency)
-            throws IOException {
-
-        BintrayAnalyzer instance = new BintrayAnalyzer();
-        instance.setBintraySearch(search);
-        specifySha1SumFor(dependency);
-
-        new Expectations() {
-            {
-                search.searchSha1(SHA1_SUM);
-                result = new FileNotFoundException("Artifact not found in Bintray");
-            }
-        };
-
-        instance.fetchArtifacts(dependency);
-    }
-
-    @Test(expected = IOException.class)
-    @SuppressWarnings("PMD.NonStaticInitializer")
-    public void testFetchMavenArtifactsAlwaysThrowsIOException(@Mocked final BintraySearch search,
-            @Mocked final Dependency dependency)
-            throws IOException {
-
-        BintrayAnalyzer instance = new BintrayAnalyzer();
-        instance.setBintraySearch(search);
-        specifySha1SumFor(dependency);
-
-        new Expectations() {
-            {
-                search.searchSha1(SHA1_SUM);
-                result = new IOException("no internet connection");
-            }
-        };
-
-        instance.fetchArtifacts(dependency);
-    }
-
-    @Test(expected = AnalysisException.class)
-    @SuppressWarnings("PMD.NonStaticInitializer")
-    public void testFetchMavenArtifactsAlwaysThrowsIOExceptionLetsTheAnalysisFail(
-            @Mocked final BintraySearch search, @Mocked final Dependency dependency)
-            throws AnalysisException, IOException {
-
-        BintrayAnalyzer instance = new BintrayAnalyzer();
-        instance.setBintraySearch(search);
-        specifySha1SumFor(dependency);
-
-        new Expectations() {
-            {
-                search.searchSha1(SHA1_SUM);
-                result = new IOException("no internet connection");
-            }
-        };
-
-        instance.analyze(dependency, null);
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        instance = new BintrayAnalyzer();
+        instance.initialize(getSettings());
+        instance.prepareFileTypeAnalyzer(null);
     }
 
     /**
-     * Specifies the mock dependency's SHA1 sum.
-     *
-     * @param dependency then dependency
+     * Test of getName method, of class BintrayAnalyzer.
      */
-    @SuppressWarnings("PMD.NonStaticInitializer")
-    private void specifySha1SumFor(final Dependency dependency) {
-        new Expectations() {
-            {
-                dependency.getSha1sum();
-                returns(SHA1_SUM, SHA1_SUM);
-            }
-        };
+    @Test
+    public void testGetName() {
+        String expResult = "Bintray Analyzer";
+        String result = instance.getName();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getAnalyzerEnabledSettingKey method, of class BintrayAnalyzer.
+     */
+    @Test
+    public void testGetAnalyzerEnabledSettingKey() {
+        String expResult = "analyzer.bintray.enabled";
+        String result = instance.getAnalyzerEnabledSettingKey();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getAnalysisPhase method, of class BintrayAnalyzer.
+     */
+    @Test
+    public void testGetAnalysisPhase() {
+        AnalysisPhase expResult = AnalysisPhase.INFORMATION_COLLECTION;
+        AnalysisPhase result = instance.getAnalysisPhase();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getFileFilter method, of class BintrayAnalyzer.
+     */
+    @Test
+    public void testGetFileFilter() {
+        FileFilter result = instance.getFileFilter();
+        assertTrue(result.accept(new File("test.jar")));
+        assertFalse(result.accept(new File("test.zip")));
+    }
+
+    /**
+     * Test of analyzeDependency method, of class BintrayAnalyzer.
+     */
+    @Test
+    public void testAnalyzeDependency() throws Exception {
+        Dependency dependency = new Dependency();
+        dependency.setSha1sum("4f268922155ff53fb7b28aeca24fb28d5a439d95");
+        assertTrue(dependency.getIdentifiers().isEmpty());
+        instance.analyzeDependency(dependency, null);
+        assertFalse(dependency.getIdentifiers().isEmpty());
     }
 }

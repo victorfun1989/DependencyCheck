@@ -487,7 +487,8 @@ public class Dependency extends EvidenceCollection implements Serializable {
                     }
                 }
             }
-            if (!found) {
+            //TODO - this may not be the actual maven coordinates, should we add a "bintray" id?
+            if (!found && artifact.getCoordinates() != null) {
                 LOGGER.debug("Adding new maven identifier {}", artifact);
                 this.addIdentifier("maven", artifact.getCoordinates(), artifact.getArtifactUrl(), Confidence.HIGHEST);
             }

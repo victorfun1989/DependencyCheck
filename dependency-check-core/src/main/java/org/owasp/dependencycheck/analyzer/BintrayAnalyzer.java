@@ -233,6 +233,9 @@ public class BintrayAnalyzer extends AbstractFileTypeAnalyzer {
             final String message = "Could not connect to Bintray API. Analysis failed.";
             LOGGER.error(message, ioe);
             throw new AnalysisException(message, ioe);
+        } catch (Throwable ex) {
+            LOGGER.error("---------------------------" + ex.getMessage(), ex);
+            throw ex;
         }
     }
 
@@ -244,16 +247,7 @@ public class BintrayAnalyzer extends AbstractFileTypeAnalyzer {
      * @throws FileNotFoundException if the specified artifact is not found
      * @throws IOException if connecting to Bintray failed
      */
-    protected BintrayArtifact[] fetchArtifacts(Dependency dependency) throws IOException {
+    private BintrayArtifact[] fetchArtifacts(Dependency dependency) throws IOException {
         return searcher.searchSha1(dependency.getSha1sum());
-    }
-
-    /**
-     * Method used by unit tests to setup the analyzer.
-     *
-     * @param searcher the Bintray Search object to use.
-     */
-    protected void setBintraySearch(BintraySearch searcher) {
-        this.searcher = searcher;
     }
 }
