@@ -160,13 +160,13 @@ public class DependencyCheckScanAgent {
      */
     private String cpeStartsWithFilter;
     /**
-     * Whether or not the Maven Central analyzer is enabled.
+     * Whether or not the Bintray analyzer is enabled.
      */
-    private boolean centralAnalyzerEnabled = true;
+    private boolean bintrayAnalyzerEnabled = true;
     /**
-     * The URL of Maven Central.
+     * The URL of Bintray.
      */
-    private String centralUrl;
+    private String bintrayUrl;
     /**
      * Whether or not the nexus analyzer is enabled.
      */
@@ -581,39 +581,39 @@ public class DependencyCheckScanAgent {
     }
 
     /**
-     * Get the value of centralAnalyzerEnabled.
+     * Get the value of bintrayAnalyzerEnabled.
      *
-     * @return the value of centralAnalyzerEnabled
+     * @return the value of bintrayAnalyzerEnabled
      */
-    public boolean isCentralAnalyzerEnabled() {
-        return centralAnalyzerEnabled;
+    public boolean isBintrayAnalyzerEnabled() {
+        return bintrayAnalyzerEnabled;
     }
 
     /**
-     * Set the value of centralAnalyzerEnabled.
+     * Set the value of bintrayAnalyzerEnabled.
      *
-     * @param centralAnalyzerEnabled new value of centralAnalyzerEnabled
+     * @param bintrayAnalyzerEnabled new value of bintrayAnalyzerEnabled
      */
-    public void setCentralAnalyzerEnabled(boolean centralAnalyzerEnabled) {
-        this.centralAnalyzerEnabled = centralAnalyzerEnabled;
+    public void setBintrayAnalyzerEnabled(boolean bintrayAnalyzerEnabled) {
+        this.bintrayAnalyzerEnabled = bintrayAnalyzerEnabled;
     }
 
     /**
-     * Get the value of centralUrl.
+     * Get the value of bintrayUrl.
      *
-     * @return the value of centralUrl
+     * @return the value of bintrayUrl
      */
-    public String getCentralUrl() {
-        return centralUrl;
+    public String getBintrayUrl() {
+        return bintrayUrl;
     }
 
     /**
-     * Set the value of centralUrl.
+     * Set the value of bintrayUrl.
      *
-     * @param centralUrl new value of centralUrl
+     * @param bintrayUrl new value of bintrayUrl
      */
-    public void setCentralUrl(String centralUrl) {
-        this.centralUrl = centralUrl;
+    public void setBintrayUrl(String bintrayUrl) {
+        this.bintrayUrl = bintrayUrl;
     }
 
     /**
@@ -969,8 +969,8 @@ public class DependencyCheckScanAgent {
         settings.setStringIfNotEmpty(Settings.KEYS.CONNECTION_TIMEOUT, connectionTimeout);
         settings.setStringIfNotEmpty(Settings.KEYS.SUPPRESSION_FILE, suppressionFile);
         settings.setStringIfNotEmpty(Settings.KEYS.CVE_CPE_STARTS_WITH_FILTER, cpeStartsWithFilter);
-        settings.setBoolean(Settings.KEYS.ANALYZER_CENTRAL_ENABLED, centralAnalyzerEnabled);
-        settings.setStringIfNotEmpty(Settings.KEYS.ANALYZER_CENTRAL_URL, centralUrl);
+        settings.setBoolean(Settings.KEYS.ANALYZER_BINTRAY_ENABLED, bintrayAnalyzerEnabled);
+        settings.setStringIfNotEmpty(Settings.KEYS.ANALYZER_BINTRAY_URL, bintrayUrl);
         settings.setBoolean(Settings.KEYS.ANALYZER_NEXUS_ENABLED, nexusAnalyzerEnabled);
         settings.setStringIfNotEmpty(Settings.KEYS.ANALYZER_NEXUS_URL, nexusUrl);
         settings.setBoolean(Settings.KEYS.ANALYZER_NEXUS_USES_PROXY, nexusUsesProxy);
