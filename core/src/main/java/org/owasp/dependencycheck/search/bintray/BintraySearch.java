@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class of methods to search Maven Central via Central.
+ * Class of methods to search Bintray.
  *
- * @author colezlaw
+ * @author Jeremy Long
  */
 @ThreadSafe
 public class BintraySearch {
@@ -109,7 +109,19 @@ public class BintraySearch {
         }
     }
 
-    private HttpURLConnection getConnection(String sha1) throws URLConnectionFailureException, MalformedURLException, IOException {
+    /**
+     * Creates an HTTP connection to Bintray's search API for the given SHA1.
+     *
+     * @param sha1 the SHA1 hash of the dependency
+     * @return the HTTP connection to Bintray; the connection is open and ready
+     * to be read
+     * @throws URLConnectionFailureException thrown if there is an exception
+     * making the connection
+     * @throws MalformedURLException thrown if the URL is malformed
+     * @throws IOException thrown if there is an error connecting to Bintray
+     */
+    private HttpURLConnection getConnection(String sha1) throws URLConnectionFailureException,
+            MalformedURLException, IOException {
         final URL url = new URL(String.format(query, rootURL, sha1));
         LOGGER.debug("Searching Bintray url {}", url);
         final URLConnectionFactory factory = new URLConnectionFactory(settings);
@@ -120,12 +132,19 @@ public class BintraySearch {
         return conn;
     }
 
-    private int counter = 0;
-
-    protected BintrayArtifact[] parseResponse(InputStream stream) throws IOException, FileNotFoundException {
-        final Reader reader = new InputStreamReader(stream, Charset.forName("UTF-8"));
-        final BintrayArtifact[] results = new Gson().fromJson(reader, BintrayArtifact[].class);
-        return results;
+    /**
+     * Parses the contents of the input stream into an array of
+     * BintrayArtifacts.
+     *
+     * @param stream the input stream to parse
+     * @return the parsed BintrayArtifact array
+     * @throws IOException thrown if there is an error reading from the stream
+     */
+    protected BintrayArtifact[] parseResponse(InputStream stream) throws IOException {
+        Gson gson = new Gson();
+        try (Reader reader = new InputStreamReader(stream, Charset.forName("UTF-8"))) {
+            return gson.fromJson(reader, BintrayArtifact[].class);
+        }
     }
 
     /**

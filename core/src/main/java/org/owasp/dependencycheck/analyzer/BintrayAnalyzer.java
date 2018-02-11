@@ -74,6 +74,11 @@ public class BintrayAnalyzer extends AbstractFileTypeAnalyzer {
     private static final String SUPPORTED_EXTENSIONS = "jar";
 
     /**
+     * The file filter used to determine which files this analyzer supports.
+     */
+    private static final FileFilter FILTER = FileFilterBuilder.newInstance().addExtensions(SUPPORTED_EXTENSIONS).build();
+
+    /**
      * The searcher itself.
      */
     private BintraySearch searcher;
@@ -167,11 +172,6 @@ public class BintrayAnalyzer extends AbstractFileTypeAnalyzer {
         return ANALYSIS_PHASE;
     }
 
-    /**
-     * The file filter used to determine which files this analyzer supports.
-     */
-    private static final FileFilter FILTER = FileFilterBuilder.newInstance().addExtensions(SUPPORTED_EXTENSIONS).build();
-
     @Override
     protected FileFilter getFileFilter() {
         return FILTER;
@@ -204,18 +204,17 @@ public class BintrayAnalyzer extends AbstractFileTypeAnalyzer {
                     try {
                         final File baseDir = getSettings().getTempDirectory();
                         pomFile = File.createTempFile("pom", ".xml", baseDir);
-                        if (!pomFile.delete()) {
-                            LOGGER.warn("Unable to fetch pom.xml for {} from Bintray; "
-                                    + "this could result in undetected CPE/CVEs.", dependency.getFileName());
-                            LOGGER.debug("Unable to delete temp file");
+                        if (pomFile.delete()) {
+                            LOGGER.debug("Downloading {}", ba.getPomUrl());
+                            final Downloader downloader = new Downloader(getSettings());
+                            downloader.fetchFile(new URL(ba.getPomUrl()), pomFile);
+                            PomUtils.analyzePOM(dependency, pomFile);
                         }
-                        LOGGER.debug("Downloading {}", ba.getPomUrl());
-                        final Downloader downloader = new Downloader(getSettings());
-                        downloader.fetchFile(new URL(ba.getPomUrl()), pomFile);
-                        PomUtils.analyzePOM(dependency, pomFile);
 
                     } catch (DownloadFailedException ex) {
-                        LOGGER.warn("Unable to download pom.xml for {} from Bintray; "
+                        //note - bintray may not actually contain the pom; requirements are different
+                        // for bintray in comparison to central
+                        LOGGER.trace("Unable to download pom.xml for {} from Bintray; "
                                 + "this could result in undetected CPE/CVEs.", dependency.getFileName());
                     } finally {
                         if (pomFile != null && pomFile.exists() && !FileUtils.deleteQuietly(pomFile)) {

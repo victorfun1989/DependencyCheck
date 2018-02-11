@@ -440,6 +440,30 @@ public class Dependency extends EvidenceCollection implements Serializable {
         final String artifactVersion = artifact.getVersion();
         final String path = artifact.getPath();
         final String artifactName = artifact.getName();
+
+        if (artifact.getArtifactUrl() != null && artifact.getCoordinates() != null) {
+            boolean found = false;
+            synchronized (this) {
+                for (Identifier i : this.identifiers) {
+                    //TODO change "maven" to "packagePath"
+                    if ("maven".equals(i.getType()) && i.getValue().replaceAll("[.:]", "/").equals(artifact.getCoordinates().replace(".", "/"))) {
+                        found = true;
+                        i.setConfidence(Confidence.HIGHEST);
+                        i.setUrl(artifact.getArtifactUrl());
+                        LOGGER.debug("Already found identifier {}. Confidence set to highest", i.getValue());
+                        break;
+                    } else if ("bintray".equals(i.getType()) && i.getValue().equals(artifact.getCoordinates())) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found && artifact.getCoordinates() != null) {
+                LOGGER.debug("Adding new bintray identifier `{}`", artifact);
+                this.addIdentifier("bintray", artifact.getCoordinates(), artifact.getArtifactUrl(), Confidence.HIGHEST);
+            }
+        }
+
         if (artifactName != null) {
             this.addEvidence(EvidenceType.PRODUCT, source, "name", artifactName, confidence);
         }
@@ -472,26 +496,6 @@ public class Dependency extends EvidenceCollection implements Serializable {
         }
         if (artifactVersion != null && !artifactVersion.isEmpty()) {
             this.addEvidence(EvidenceType.VERSION, source, "version", artifactVersion, confidence);
-        }
-        if (artifact.getArtifactUrl() != null) {
-            boolean found = false;
-            synchronized (this) {
-                for (Identifier i : this.identifiers) {
-                    //TODO change "maven" to "packagePath"
-                    if ("maven".equals(i.getType()) && i.getValue().equals(artifact.getCoordinates())) {
-                        found = true;
-                        i.setConfidence(Confidence.HIGHEST);
-                        i.setUrl(artifact.getArtifactUrl());
-                        LOGGER.debug("Already found identifier {}. Confidence set to highest", i.getValue());
-                        break;
-                    }
-                }
-            }
-            //TODO - this may not be the actual maven coordinates, should we add a "bintray" id?
-            if (!found && artifact.getCoordinates() != null) {
-                LOGGER.debug("Adding new maven identifier {}", artifact);
-                this.addIdentifier("maven", artifact.getCoordinates(), artifact.getArtifactUrl(), Confidence.HIGHEST);
-            }
         }
     }
 

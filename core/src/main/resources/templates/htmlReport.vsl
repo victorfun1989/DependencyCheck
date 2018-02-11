@@ -638,7 +638,7 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                         #set($cpeIdConf="")
                         #set($sortValue="")
                         #foreach($id in $dependency.getIdentifiers())
-                            #if ($id.type!="maven" && $id.type!="npm")
+                            #if ($id.type!="maven" && $id.type!="npm" && $id.type!="bintray")
                                 #set($sortValue=$sortValue+$id.value)
                             #end
                         #end
@@ -646,7 +646,7 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                         #set($sortValue="")
                         #set($cpeSort=0)
                         #foreach($id in $dependency.getIdentifiers())
-                            #if ($id.type=="maven" || $id.type=="npm")
+                            #if ($id.type=="maven" || $id.type=="npm" || $id.type=="bintray")
                                 #if ($mavenlink=="" || !$mavenlink.url)
                                     #set($mavenlink=$id)
                                 #end
@@ -769,7 +769,7 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                                         <li>MD5:&nbsp;#if($related.Md5sum)$enc.html($related.Md5sum)#end</li>
                                         #foreach($id in $related.getIdentifiers())
                                             #if( $id.url )                                                
-                                                #if ($id.type=="maven")
+                                                #if ($id.type=="maven" || $id.type=="bintray")
                                                     ##yes, we are HTML Encoding the href. this is okay. We can't URL encode as we have to trust the analyzer here...
                                                     <li>$enc.html($id.type):&nbsp;<a href="$enc.html($id.url)" target="_blank">$enc.html($id.value)</a>&nbsp;<span title="verified from repo" style="color:green">&#x2713;</span>
                                                 #else
@@ -803,13 +803,13 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                             <ul>
                             #set($suppressGav='')    
                             #foreach($id in $dependency.getIdentifiers())
-                                #if ($id.type=="maven")
+                                #if ($id.type=="maven" || $id.type=="bintray")
                                     #set($suppressGav=$id.value)    
                                 #end
                             #end
                             #foreach($id in $dependency.getIdentifiers())
                                 #if( $id.url )
-                                    #if($id.type=="maven")
+                                    #if($id.type=="maven" || $id.type=="bintray")
                                     ##yes, we are HTML Encoding the href. this is okay. We can't URL encode as we have to trust the analyzer here...
                                     <li><b>$enc.html($id.type):</b>&nbsp;<a href="$enc.html($id.url)" target="_blank">$enc.html($id.value)</a>&nbsp;<span title="verified from repo" style="color:green">&#x2713;</span>
                                     #else
@@ -985,7 +985,7 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                                     <ul>
                                     #foreach($id in $dependency.getSuppressedIdentifiers())
                                         #if( $id.url )
-                                            #if($id.type=="maven")
+                                            #if($id.type=="maven" || $id.type=="bintray")
                                             <li><b>$enc.html($id.type):</b>&nbsp;<a href="$enc.html($id.url)" target="_blank">$enc.html($id.value)</a>&nbsp;<span title="verified from repo" style="color:green">&#x2713;</span>&nbsp;&nbsp;<span class="suppressedLabel" >suppressed</span>
                                             #else
                                             <li><b>$enc.html($id.type):</b>&nbsp;<a href="$enc.html($id.url)" target="_blank">$enc.html($id.value)</a>&nbsp;&nbsp;<span class="suppressedLabel" >suppressed</span>
