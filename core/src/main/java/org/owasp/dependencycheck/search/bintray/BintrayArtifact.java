@@ -167,7 +167,7 @@ public class BintrayArtifact {
         if (path == null) {
             return null;
         }
-        if (path.endsWith(name)) {
+        if (path.endsWith(name) && !path.equals(name)) {
             return path.substring(0, path.length()-name.length()-1);
         } else {
             return path;
