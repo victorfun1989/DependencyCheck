@@ -27,6 +27,7 @@ import java.util.Locale;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.License;
@@ -834,9 +835,21 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
                         if (d != null) {
                             final MavenArtifact ma = new MavenArtifact(groupId, artifactId, version);
                             d.addAsEvidence("pom", ma, Confidence.HIGHEST);
+                            ArtifactVersion current = null;
+                            try {
+                                current = dependencyNode.getArtifact().getSelectedVersion();
+                            } catch (OverConstrainedVersionException ex) {
+                                getLog().debug(String.format("Unable to get selected version for artifact %s", dependencyNode.getArtifact().getId()));
+                            }
+                            getLog().error(String.format("-------Available Versions %s", availableVersions != null));
                             if (availableVersions != null) {
+                                getLog().error(String.format("--------------current %s", current.toString()));
                                 for (ArtifactVersion av : availableVersions) {
-                                    d.addAvailableVersion(av.toString());
+                                    getLog().error(String.format("-------------------- %s", av.toString()));
+                                    getLog().error(String.format("-------------------- %s", current.compareTo(av)));
+                                    if (current != null && current.compareTo(av) < 0) {
+                                        d.addAvailableVersion(av.toString());
+                                    }
                                 }
                             }
                             getLog().debug(String.format("Adding project reference %s on dependency %s",

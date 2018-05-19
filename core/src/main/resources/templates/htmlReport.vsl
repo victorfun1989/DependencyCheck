@@ -649,7 +649,7 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                                 #set($sortValue=$sortValue+$id.value)
                             #end
                         #end
-                        <td data-sort-value="$sortValue">
+                        <td data-sort-value="$enc.html($sortValue.toLowerCase())">
                         #set($sortValue="")
                         #set($cpeSort=0)
                         #foreach($id in $dependency.getIdentifiers())
@@ -743,6 +743,15 @@ Getting Help: <a href="https://groups.google.com/forum/#!forum/dependency-check"
                                 <br/><b>Referenced In Projects/Scopes:</b><ul>
                                 #foreach($ref in $dependency.projectReferences)
                                     <li>$enc.html($ref)</li>
+                                #end
+                                </ul>
+                            #end
+                            #if ($dependency.availableVersions.size()>=1)
+                                <br/><b>Available Versions:</b>
+                                #set($needsComma="")
+                                #foreach($ref in $dependency.availableVersions)
+                                    $needsComma$enc.html($ref)
+                                    #set($needsComma=", ")
                                 #end
                                 </ul>
                             #end
