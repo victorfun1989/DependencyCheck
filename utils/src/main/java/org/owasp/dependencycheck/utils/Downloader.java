@@ -93,37 +93,4 @@ public final class Downloader {
             throw new DownloadFailedException(msg, ex);
         }
     }
-
-    /**
-     * Analyzes the IOException, logs the appropriate information for debugging
-     * purposes, and then throws a DownloadFailedException that wraps the IO
-     * Exception for common IO Exceptions. This is to provide additional details
-     * to assist in resolution of the exception.
-     *
-     * @param ex the original exception
-     * @throws DownloadFailedException a wrapper exception that contains the
-     * original exception as the cause
-     */
-    protected void checkForCommonExceptionTypes(IOException ex) throws DownloadFailedException {
-        Throwable cause = ex;
-        while (cause != null) {
-            if (cause instanceof java.net.UnknownHostException) {
-                final String msg = format("Unable to resolve domain '%s'", cause.getMessage());
-                LOGGER.error(msg);
-                throw new DownloadFailedException(msg);
-            }
-            if (cause instanceof InvalidAlgorithmParameterException) {
-                final String keystore = System.getProperty("javax.net.ssl.keyStore");
-                final String version = System.getProperty("java.version");
-                final String vendor = System.getProperty("java.vendor");
-                LOGGER.info("Error making HTTPS request - InvalidAlgorithmParameterException");
-                LOGGER.info("There appears to be an issue with the installation of Java and the cacerts."
-                        + "See closed issue #177 here: https://github.com/jeremylong/DependencyCheck/issues/177");
-                LOGGER.info("Java Info:\njavax.net.ssl.keyStore='{}'\njava.version='{}'\njava.vendor='{}'",
-                        keystore, version, vendor);
-                throw new DownloadFailedException("Error making HTTPS request. Please see the log for more details.");
-            }
-            cause = cause.getCause();
-        }
-    }
 }
