@@ -104,12 +104,6 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
      * Sets whether or not the external report format should be used.
      */
     @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "metaFileName", defaultValue = "dependency-check.ser", required = true)
-    private String dataFileName;
-    /**
-     * Sets whether or not the external report format should be used.
-     */
-    @SuppressWarnings("CanBeFinal")
     @Parameter(property = "failOnError", defaultValue = "true", required = true)
     private boolean failOnError;
 
@@ -200,14 +194,7 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
     @SuppressWarnings("CanBeFinal")
     @Parameter(property = "enableRetired")
     private Boolean enableRetired;
-    /**
-     * Generate aggregate reports in multi-module projects.
-     *
-     * @deprecated use the aggregate goal instead
-     */
-    @Parameter(property = "aggregate")
-    @Deprecated
-    private Boolean aggregate;
+
     /**
      * The report format to be generated (HTML, XML, VULN, ALL). This
      * configuration option has no affect if using this within the Site plug-in
@@ -336,28 +323,16 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
     @Parameter(property = "nodeAuditAnalyzerEnabled", required = false)
     private Boolean nodeAuditAnalyzerEnabled;
     /**
-     * Sets whether or not the Node Security Project Analyzer should be used.
-     *
-     * @deprecated As of release 3.3.3, replaced by
-     * {@link #nodeAuditAnalyzerEnabled}
-     */
-    @Deprecated
-    @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "nspAnalyzerEnabled", required = false)
-    private Boolean nspAnalyzerEnabled;
-    /**
      * Sets whether or not the Retirejs Analyzer should be used.
      */
     @SuppressWarnings("CanBeFinal")
     @Parameter(property = "retireJsAnalyzerEnabled", required = false)
     private Boolean retireJsAnalyzerEnabled;
-
     /**
      * Whether or not the .NET Assembly Analyzer is enabled.
      */
     @Parameter(property = "assemblyAnalyzerEnabled", required = false)
     private Boolean assemblyAnalyzerEnabled;
-
     /**
      * Whether or not the .NET Nuspec Analyzer is enabled.
      */
@@ -580,26 +555,14 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
      * Data Mirror URL for CVE 1.2.
      */
     @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "cveUrl12Modified", defaultValue = "", required = false)
-    private String cveUrl12Modified;
-    /**
-     * Data Mirror URL for CVE 2.0.
-     */
-    @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "cveUrl20Modified", defaultValue = "", required = false)
-    private String cveUrl20Modified;
+    @Parameter(property = "cveUrlModified", defaultValue = "", required = false)
+    private String cveUrlModified;
     /**
      * Base Data Mirror URL for CVE 1.2.
      */
     @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "cveUrl12Base", defaultValue = "", required = false)
-    private String cveUrl12Base;
-    /**
-     * Data Mirror URL for CVE 2.0.
-     */
-    @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "cveUrl20Base", defaultValue = "", required = false)
-    private String cveUrl20Base;
+    @Parameter(property = "cveUrlBase", defaultValue = "", required = false)
+    private String cveUrlBase;
     /**
      * Optionally skip excessive CVE update checks for a designated duration in
      * hours.
@@ -633,25 +596,6 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
     @SuppressWarnings("CanBeFinal")
     @Parameter(property = "retirejs", required = false)
     private Retirejs retirejs;
-
-    /**
-     * The Proxy URL.
-     *
-     * @deprecated Please use mavenSettings instead
-     */
-    @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "proxyUrl", defaultValue = "", required = false)
-    @Deprecated
-    private String proxyUrl = null;
-    /**
-     * Sets whether or not the external report format should be used.
-     *
-     * @deprecated the internal report is no longer supported
-     */
-    @SuppressWarnings("CanBeFinal")
-    @Parameter(property = "externalReport")
-    @Deprecated
-    private String externalReport = null;
 
     /**
      * The artifact scope filter.
@@ -715,24 +659,9 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
         if (shouldSkip) {
             getLog().info("Skipping " + getName(Locale.US));
         } else {
-            validateAggregate();
-            project.setContextValue(getOutputDirectoryContextKey(), this.outputDirectory);
+            //TODO remove
+            //project.setContextValue(getOutputDirectoryContextKey(), this.outputDirectory);
             runCheck();
-        }
-    }
-
-    /**
-     * Checks if the aggregate configuration parameter has been set to true. If
-     * it has a MojoExecutionException is thrown because the aggregate
-     * configuration parameter is no longer supported.
-     *
-     * @throws MojoExecutionException thrown if aggregate is set to true
-     */
-    private void validateAggregate() throws MojoExecutionException {
-        if (aggregate != null && aggregate) {
-            final String msg = "Aggregate configuration detected - as of dependency-check 1.2.8 this no longer supported. "
-                    + "Please use the aggregate goal instead.";
-            throw new MojoExecutionException(msg);
         }
     }
 
@@ -794,12 +723,8 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
         }
 
         generatingSite = true;
-        try {
-            validateAggregate();
-        } catch (MojoExecutionException ex) {
-            throw new MavenReportException(ex.getMessage());
-        }
-        project.setContextValue(getOutputDirectoryContextKey(), getReportOutputDirectory());
+        //TODO remove
+        //project.setContextValue(getOutputDirectoryContextKey(), getReportOutputDirectory());
         try {
             runCheck();
         } catch (MojoExecutionException ex) {
@@ -829,10 +754,6 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
      * @return the directory to write the report(s)
      */
     protected File getCorrectOutputDirectory(MavenProject current) {
-        final Object obj = current.getContextValue(getOutputDirectoryContextKey());
-        if (obj != null && obj instanceof File) {
-            return (File) obj;
-        }
         File target = new File(current.getBuild().getDirectory());
         if (target.getParentFile() != null && "target".equals(target.getParentFile().getName())) {
             target = target.getParentFile();
@@ -1428,14 +1349,6 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_EXPERIMENTAL_ENABLED, enableExperimental);
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_RETIRED_ENABLED, enableRetired);
 
-        if (externalReport != null) {
-            getLog().warn("The 'externalReport' option was set; this configuration option has been removed. "
-                    + "Please update the dependency-check-maven plugin's configuration");
-        }
-
-        if (proxyUrl != null && !proxyUrl.isEmpty()) {
-            getLog().warn("Deprecated configuration detected, proxyUrl will be ignored; use the maven settings to configure the proxy instead");
-        }
         final Proxy proxy = getMavenProxy();
         if (proxy != null) {
             settings.setString(Settings.KEYS.PROXY_SERVER, proxy.getHost());
@@ -1494,12 +1407,6 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_AUTOCONF_ENABLED, autoconfAnalyzerEnabled);
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_COMPOSER_LOCK_ENABLED, composerAnalyzerEnabled);
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_NODE_PACKAGE_ENABLED, nodeAnalyzerEnabled);
-
-        if (nspAnalyzerEnabled != null) {
-            getLog().error("The nspAnalyzerEnabled configuration has been deprecated and replaced by nodeAuditAnalyzerEnabled");
-            getLog().error("The nspAnalyzerEnabled configuration will be removed in the next major release");
-            settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_NODE_AUDIT_ENABLED, nspAnalyzerEnabled);
-        }
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_NODE_AUDIT_ENABLED, nodeAuditAnalyzerEnabled);
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_RETIREJS_ENABLED, retireJsAnalyzerEnabled);
         settings.setBooleanIfNotNull(Settings.KEYS.ANALYZER_BUNDLE_AUDIT_ENABLED, bundleAuditAnalyzerEnabled);
@@ -1563,10 +1470,8 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
         settings.setStringIfNotEmpty(Settings.KEYS.DB_PASSWORD, databasePassword);
         settings.setStringIfNotEmpty(Settings.KEYS.DATA_DIRECTORY, dataDirectory);
 
-        settings.setStringIfNotEmpty(Settings.KEYS.CVE_MODIFIED_12_URL, cveUrl12Modified);
-        settings.setStringIfNotEmpty(Settings.KEYS.CVE_MODIFIED_20_URL, cveUrl20Modified);
-        settings.setStringIfNotEmpty(Settings.KEYS.CVE_SCHEMA_1_2, cveUrl12Base);
-        settings.setStringIfNotEmpty(Settings.KEYS.CVE_SCHEMA_2_0, cveUrl20Base);
+        settings.setStringIfNotEmpty(Settings.KEYS.CVE_MODIFIED_JSON, cveUrlModified);
+        settings.setStringIfNotEmpty(Settings.KEYS.CVE_BASE_JSON, cveUrlBase);
         settings.setIntIfNotNull(Settings.KEYS.CVE_CHECK_VALID_FOR_HOURS, cveValidForHours);
 
         artifactScopeExcluded = new ArtifactScopeExcluded(skipTestScope, skipProvidedScope, skipSystemScope, skipRuntimeScope);
@@ -1683,7 +1588,7 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
         for (Dependency d : dependencies) {
             boolean addName = true;
             for (Vulnerability v : d.getVulnerabilities()) {
-                if (failBuildOnAnyVulnerability || v.getCvssV2Score() >= failBuildOnCVSS) {
+                if (failBuildOnAnyVulnerability || v.getCvssV2().getScore() >= failBuildOnCVSS) {
                     if (addName) {
                         addName = false;
                         ids.append(NEW_LINE).append(d.getFileName()).append(": ");
@@ -1754,30 +1659,6 @@ public abstract class BaseDependencyCheckMojo extends AbstractMojo implements Ma
                 getLog().warn(msg);
             }
         }
-    }
-
-    //</editor-fold>
-    //<editor-fold defaultstate="collapsed" desc="Methods to read/write the serialized data file">
-    /**
-     * Returns the key used to store the path to the data file that is saved by
-     * <code>writeDataFile()</code>. This key is used in the
-     * <code>MavenProject.(set|get)ContextValue</code>.
-     *
-     * @return the key used to store the path to the data file
-     */
-    protected String getDataFileContextKey() {
-        return "dependency-check-path-" + dataFileName;
-    }
-
-    /**
-     * Returns the key used to store the path to the output directory. When
-     * generating the report in the <code>executeAggregateReport()</code> the
-     * output directory should be obtained by using this key.
-     *
-     * @return the key used to store the path to the output directory
-     */
-    protected String getOutputDirectoryContextKey() {
-        return "dependency-output-dir-" + dataFileName;
     }
 
     //</editor-fold>
